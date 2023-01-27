@@ -19,7 +19,10 @@ public class SberTest extends BaseTests{
                 .fillFields("Срок кредита", "30")
                 .clickInsuranceCheckBox()
                 .checkInsuranceCheckBox()
-                .checkCreditInfo("2122000", "21664", "36829", "11");
+                .checkCreditInfo("Ежемесячный платеж", "21 664")
+                .checkCreditInfo("Сумма кредита", " 2 122 000")
+                .checkCreditInfo("Необходимый доход", " 36 829 ₽")
+                .checkCreditInfo("Процентная ставка", "11% ");
     }
 
 }

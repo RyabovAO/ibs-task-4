@@ -2,18 +2,13 @@ package pages;
 
 import io.qameta.allure.Step;
 import org.junit.jupiter.api.Assertions;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
-
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 public class HypothecPage extends BasePage {
-
-    private final String locator = "//span[contains(text(),'%s')]/..//span[contains(text(),'₽')]";
 
     @FindBy(xpath = "//*[contains(@sandbox,'allow-forms allow-scripts allow-same')]")
     private WebElement formRegistration;
@@ -30,34 +25,24 @@ public class HypothecPage extends BasePage {
     @FindBy(xpath = "//span[contains(text(),'Страхование')]/..//label[contains(@class,'switch-root-4-0-1')]")
     private WebElement checkInsuranceCheckBox;
 
-    @FindBy(xpath = "//span[contains(text(),'Ежемесячный платеж')]/..//span[contains(text(),'₽')]")
-    private WebElement monthlyPayment;
+    @FindBy(xpath = "//div[@id='calculator-root']//span")
+    private List<WebElement> listResultMenuTitle;
 
-    @FindBy(xpath = "//span[contains(text(),'Сумма кредита')]/..//span[contains(text(),'₽')]")
-    private WebElement creditSum;
-
-    @FindBy(xpath =
-            "//div[@data-test-id='main-results-block']//span[contains(text(),'Процентная ставка')]/..//span[contains(text(),'%')]")
-    private WebElement interestRate;
-
-    @FindBy(xpath = "//span[contains(text(),'Необходимый доход')]/..//span[contains(text(),'₽')]")
-    private WebElement requiredIncome;
-
-    @Step
+    @Step("Проверка что открыта страница 'Ипотека'")
     public HypothecPage checkHypothecPage() {
         waitUtilElementToBeVisible(formRegistration);
         Assertions.assertTrue(isPageOpen(formRegistration), "Страница 'Ипотека' не открыта");
         return this;
     }
 
-    @Step
+    @Step("Переход в блок ввода параметров ипотеки")
     public HypothecPage switchFrame() {
         scrollToElementJs(formRegistration);
         toFrame(formRegistration);
         return this;
     }
 
-    @Step
+    @Step("Заполнить поле {fieldName} значением {value}")
     public HypothecPage fillFields(String fieldName, String value) {
         for (WebElement fieldItem : listFieldName) {
             if (fieldItem.getText().contains(fieldName)) {
@@ -80,13 +65,13 @@ public class HypothecPage extends BasePage {
         }
     }
 
-    @Step
+    @Step("Выключить чекбокс страхование жизни")
     public HypothecPage clickInsuranceCheckBox() {
         clickToElementJs(insuranceCheckBox);
         return this;
     }
 
-    @Step
+    @Step("Прверка что чекбокс выключен")
     public HypothecPage checkInsuranceCheckBox() {
         waitUtilElementToBeVisible(checkInsuranceCheckBox);
         Assertions.assertTrue(checkInsuranceCheckBox.isDisplayed(),
@@ -94,19 +79,24 @@ public class HypothecPage extends BasePage {
         return this;
     }
 
-    @Step
-    public HypothecPage checkCreditInfo(String creditSum1, String monthlyPayment1, String requiredIncome1, String interestRate1) {
-        Assertions.assertAll(() -> Assertions.assertEquals(creditSum1, getElementText(creditSum),
-                        "Сумма кредита не равно введенной"),
-                () -> Assertions.assertEquals(monthlyPayment1, getElementText(monthlyPayment),
-                        "Рассчитаный ежемесячный платеж не равен введенному"),
-                () -> Assertions.assertEquals(requiredIncome1, getElementText(requiredIncome),
-                        "Ежемесячный платёж не равен введенному"),
-                () -> Assertions.assertEquals(interestRate1, getElementText(interestRate),
-                        "Процентная ставка не равна введенной"));
+    @Step("Проверить что значение поля {resTitle} соответствует значению {value}")
+    public HypothecPage checkCreditInfo(String resTitle, String value) {
+        Assertions.assertEquals(value, getCreditResult(resTitle), "Параметры кредита не совпадают");
         return this;
     }
 
-
+    private String getCreditResult(String resTitle) {
+        String creditValue = "";
+        waitPageLoad(500, 250);
+        for (WebElement element : listResultMenuTitle) {
+            if (element.getText().contains(resTitle)) {
+                waitPageLoad(500, 250);
+                creditValue = getElementTextAsNumber(element.findElement(By.xpath("//span")));
+                return creditValue;
+            }
+            Assertions.fail("Результат кредита с названием '" + resTitle + "' не найдено");
+        }
+        return creditValue;
+    }
 
 }

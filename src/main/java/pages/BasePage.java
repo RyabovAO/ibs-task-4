@@ -4,14 +4,12 @@ import constants.PropConst;
 import managers.DriverManager;
 import managers.PageManager;
 import managers.TestPropManager;
-import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.time.Duration;
 
 public class BasePage {
@@ -48,15 +46,11 @@ public class BasePage {
         driverManager.getDriver().switchTo().frame(element);
     }
 
-    protected void toDefaultFrame() {
-        driverManager.getDriver().switchTo().defaultContent();
-    }
-
     protected boolean isPageOpen(WebElement webElement) {
         return webElement.isDisplayed();
     }
 
-    protected String getElementText(WebElement webElement) {
+    protected String getElementTextAsNumber(WebElement webElement) {
         return webElement.getText().replaceAll("\\D", "");
     }
 
@@ -70,10 +64,6 @@ public class BasePage {
 
     protected void clickToElementJs(WebElement element) {
         js.executeScript("arguments[0].click();", element);
-    }
-
-    private By getElementByText(String locator, String value) {
-        return By.xpath(String.format(locator, value));
     }
 
     protected void waitPageLoad(int maxWaitMillis, int pollDelimiter) {
